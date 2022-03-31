@@ -35,14 +35,14 @@ void main (int argc, char *argv[])
     }
    
 	// it is here that we will do hw3
-	runStations(records);
+	runStations(records, outputFile);
 
     // write record
-	if (accessFile(outputFile, 1, records) == -1) 
-    {
-        printf("Failed to write text file: %s\n", argv[2]);
-	exit(1);
-    }
+	// if (accessFile(outputFile, 1, records) == -1) 
+    // {
+    //     printf("Failed to write text file: %s\n", argv[2]);
+	// exit(1);
+    // }
 
     return;
 }

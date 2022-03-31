@@ -15,6 +15,6 @@
 #include "record_reader.h" 
 
 
-void runStations(struct product_record records[]);
+void runStations(struct product_record records[], char* outputFile);
 
 #endif 
