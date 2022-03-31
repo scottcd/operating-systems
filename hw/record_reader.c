@@ -92,8 +92,8 @@ void readRecords(FILE* fp, struct product_record records[])
 	   
 	    strcpy(records[i].name, buffer);
 
-	    fgets(buffer, sizeof(records[i].price), fp); 
-	    records[i].price = atof(buffer);
+	   	getline(&line, &len, fp);
+	    records[i].price = atof(line);
 	   
 	    getline(&line, &len, fp);
 	    records[i].number = atoi(line);

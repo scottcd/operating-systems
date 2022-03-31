@@ -15,6 +15,7 @@ fi
 # Second, check for the existence of hw1; if not there, quit with error
 if test -f "hw3"; then
     
+    
     echo -e "\n-------------------------"
     echo "Reading from: order.txt"
     echo -e "-------------------------\n"
@@ -25,10 +26,11 @@ if test -f "hw3"; then
     echo -e "-------------------------\n"
     ./hw3 order1.txt out1
 
-    echo -e "\n-------------------------"
-    echo "Reading from: order2.txt"
-    echo -e "-------------------------\n"
-    ./hw3 order2.txt out2
+    # echo -e "\n-------------------------"
+    # echo "Reading from: order2.txt"
+    # echo -e "-------------------------\n"
+    # ./hw3 order2.txt out2 head 
+    
 else
     echo "hw3 file not found."
     exit 1

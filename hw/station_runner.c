@@ -51,7 +51,8 @@ void runStations(struct product_record records[], char* outputFile)
                     station2();
                     break;
                 case 3:
-                 station3();
+                    // running total
+                    station3();
                     break;
                 default:
                     station4(i + 1);
@@ -84,10 +85,20 @@ void station0()
     record.tax = (record.price * record.number) * .05;
     
     
-    
-    // work is done.. set station to 1 and write to our pipe
+    // HERE skip station 2??
     record.stations[0] = 1;
-    write(s0[1], &record, sizeof(struct product_record));
+    if (record.number >= 1000)
+    {
+        write(s0[1], NULL, sizeof(struct product_record)); 
+        write(s1[1], &record, sizeof(struct product_record)); 
+    }
+    else{
+        write(s0[1], &record, sizeof(struct product_record)); 
+    }
+
+
+    
+    
     //printf("station 0 processing..\n" );
 }
 
@@ -97,7 +108,10 @@ void station1()
     struct product_record record;
     read(s0[0], &record, sizeof(struct product_record));
     
-    
+    if (&record == NULL)
+    {
+        return;
+    }
 
     // compute the shipping and handling, $10 plus 1% of the amount ordered
     double amountOrdered = record.price * record.number;
