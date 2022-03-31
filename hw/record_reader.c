@@ -75,11 +75,13 @@ void writeRecord(FILE* fp, struct product_record* record)
 // reads a product_record struct from a user-specified file
 void readRecords(FILE* fp, struct product_record records[])
 {
+	size_t len = 0;
 	void* buffer = malloc(sizeof(struct product_record));
+	char *line = NULL;
 	int i = 0;
-	while (fgets(buffer, sizeof(records[i].idnumber), fp) != NULL) 
+	while (getline(&line, &len, fp) != -1) 
 	{
-	    records[i].idnumber = atoi(buffer);
+	    records[i].idnumber = atoi(line);
 
 	    fgets(buffer, sizeof(records[i].name), fp); 
 	    char *p;
@@ -93,8 +95,8 @@ void readRecords(FILE* fp, struct product_record records[])
 	    fgets(buffer, sizeof(records[i].price), fp); 
 	    records[i].price = atof(buffer);
 	   
-	    fgets(buffer, sizeof(records[i].number), fp); 
-	    records[i].number = atoi(buffer);
+	    getline(&line, &len, fp);
+	    records[i].number = atoi(line);
 
 	    fgets(buffer, sizeof(records[i].tax), fp); 
 	    records[i].tax = atof(buffer);
