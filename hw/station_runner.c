@@ -30,34 +30,30 @@ void runAllStations(struct product_record records[], char* outputFile)
     fp = fopen(path, "w");
     int station_pid [MAXSTAGES] = {0,0,0,0,0};
     
-    // run each record
-    // for (int i = 0; i < getFileCount(); i++)
-    // {
+    
+    write(mypipe[0][1], &records[0], sizeof(struct product_record));
         
-        write(mypipe[0][1], &records[0], sizeof(struct product_record));
-        
-        int *pid;
-        // create 5 child processes
-        for (int j = 0; j < 5; j++)
-        {
-            pid = forkAChildStation(0, j, station_pid, records);
-            if (pid[0] == 0)
-                break;
-        }
-        
-        // read record from pipe
-        if(pid[0] != 0){
-            waitpid(station_pid[4], &status, 0);
-            struct product_record readRecord;
-            read(mypipe[4][0], &readRecord, sizeof(struct product_record));
-            // write record to file
-            writeRecord(fp, &readRecord);
-        }
-        else{
-            //printf("\n\n----\nchild\n");
-            //printf("----%d\n\n", pid[1]);
-        }
-    //}
+    int *pid;
+    // create 5 child processes
+    for (int j = 0; j < 5; j++)
+    {
+        pid = forkAChildStation(0, j, station_pid, records);
+        if (pid[0] == 0)
+            break;
+    }
+    
+    // read record from pipe
+    if(pid[0] != 0){
+        waitpid(station_pid[4], &status, 0);
+        struct product_record readRecord;
+        read(mypipe[4][0], &readRecord, sizeof(struct product_record));
+        // write record to file
+        writeRecord(fp, &readRecord);
+    }
+    else{
+        //printf("\n\n----\nchild\n");
+        //printf("----%d\n\n", pid[1]);
+    }
     
     printFinalStatistics(pid, 0);
     fclose(fp);
@@ -78,9 +74,6 @@ int* forkAChildStation(int i, int j, int station_pid[],  struct product_record r
         }
         else if (station_pid[j] == 0)
         {   
-                  
-                    
-                        
             //printf("station %d created.\n", j);
             // wait for the previous station to finish
             waitpid(station_pid[j ? j : j - 1], &station_pid[j], 0); 
@@ -117,22 +110,20 @@ int* forkAChildStation(int i, int j, int station_pid[],  struct product_record r
 void printFinalStatistics(int* station_pid, int stationStats){
     // create phony product and write to pipes
     if(station_pid[0] != 0){
-        struct product_record endRecord = createLastProductRecord();
-        pipeEndRecordToAllStations(endRecord);
         // print stats
         printf("----------------\n");
         printf("Final Statistics\n");
         printf("----------------\n\n");
         printf("Station #    Records Processed\n");
         printf("---------    -----------------\n");
+        struct product_record endRecord = createLastProductRecord();
+        pipeEndRecordToAllStations(endRecord);
+       
     }
     else{
-printStationStatistics(station_pid[2], station_pid[1]);
-    }
-    
-//          printf("miso m%d\n", station_pid[1]);
         
-    
+        printStationStatistics(station_pid[2], station_pid[1]);
+    }
 }
 
 struct product_record createLastProductRecord(){
@@ -165,12 +156,11 @@ int station0( int stationStats)
     // read our record from the pipe
     struct product_record record;
     read(mypipe[0][0], &record, sizeof(struct product_record));
-    
+    printf("0 %s\n", record.name);
+
     // check if we are done
     if(record.stations[0] == -1)
     {
-        
-        printStationStatistics(0, stationStats);
         return stationStats;
     }
     stationStats++;
@@ -182,13 +172,13 @@ int station0( int stationStats)
     if (record.number >= 1000)
     {
         write(mypipe[1][1], NULL, sizeof(struct product_record)); 
+        sleep(1);
+        //close(mypipe[4][1]);
         write(mypipe[2][1], &record, sizeof(struct product_record)); 
     }
     else{
         write(mypipe[1][1], &record, sizeof(struct product_record)); 
     }
-
-
     
     return stationStats;
     //printf("station 0 processing..\n" );
@@ -201,11 +191,11 @@ int station1( int stationStats)
     // read our record from the pipe
     struct product_record record;
     read(mypipe[1][0], &record, sizeof(struct product_record));
+    printf("1 %s\n", record.name);    
 
     // check if we are done
     if(record.stations[0] == -1)
     {
-        printStationStatistics(1, stationStats);
         return stationStats;
     }
 
@@ -231,11 +221,11 @@ int station2( int stationStats)
     // read our record from the pipe
     struct product_record record;
     read(mypipe[2][0], &record, sizeof(struct product_record));
-    
+    printf("2 %s\n", record.name);
+
     // check if we are done
     if(record.stations[2] == -1)
     {
-        printStationStatistics(2, stationStats);
         return stationStats;
     }
     
@@ -256,13 +246,11 @@ int station3( int stationStats)
     // read our record from the pipe
     struct product_record record;
     read(mypipe[3][0], &record, sizeof(struct product_record));
-    
+    printf("3 %s\n", record.name);
     
     // check if we are done
     if(record.stations[3] == -1)
     {
-        printStationStatistics(3, stationStats);
-        printf("na\n");
         return stationStats;
     }
 
@@ -280,15 +268,15 @@ int station3( int stationStats)
 
 int station4(int recordNumber,  int stationStats)
 {
+    //sleep(.1);
     // read our record from the pipe
     struct product_record record;
     read(mypipe[4][0], &record, sizeof(struct product_record));
-    
+    printf("4 %s\n", record.name);
 
     // check if we are done
     if(record.stations[4] == -1)
     {
-        printStationStatistics(4, stationStats);
         return stationStats;
     }
     stationStats++;
