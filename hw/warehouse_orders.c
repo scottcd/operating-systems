@@ -35,7 +35,7 @@ void main (int argc, char *argv[])
     }
    
 	// it is here that we will do hw3
-	runStations(records, outputFile);
+	runAllStations(records, outputFile);
 
     // write record
 	// if (accessFile(outputFile, 1, records) == -1) 

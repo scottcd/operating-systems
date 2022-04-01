@@ -13,6 +13,7 @@ int getFileCount ()
     return fileCount;
 }
 
+
 // opens a file for read/write, and then calls the appropriate method
 int accessFile (char* fileName, int fd, struct product_record records[]) 
 {
