@@ -12,7 +12,7 @@
 #include <string.h>   
 
 
-int getFileCount();
+int getRecordCount();
 int accessFile(char* fileName, int fd, struct product_record records[]);
 void writeRecord(FILE* fp, struct product_record* record);
 void readRecords(FILE* fp, struct product_record records[]);

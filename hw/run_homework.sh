@@ -35,8 +35,8 @@ RunOrders()
 {
     case "$1" in
     # all
-    0) echo "hi 0";exit 1
-        echo -e "\n-------------------------"
+    0)
+	echo -e "\n-------------------------"
         echo "Reading from: ALL FILES"
         echo -e "-------------------------\n"
         echo -e "-------------------------\n"
@@ -56,14 +56,14 @@ RunOrders()
         ./hw3 order.txt out
     ;;
     # order2.txt
-    2) echo "hi 2";exit 1
-        echo -e "\n-------------------------"
+    2)
+ 	echo -e "\n-------------------------"
         echo "Reading from: order.txt"
         echo -e "-------------------------\n"
         ./hw3 order1.txt out
     ;;
     # order1.txt
-    3) echo "hi 3";exit 1
+    3) 
         echo -e "\n-------------------------"
         echo "Reading from: order.txt"
         echo -e "-------------------------\n"

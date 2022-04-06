@@ -8,7 +8,7 @@
 
 int fileCount = 0;
 
-int getFileCount ()
+int getRecordCount ()
 {
     return fileCount;
 }
