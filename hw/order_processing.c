@@ -8,6 +8,7 @@
 #include "file_services.h" 
 #include "station_services.h" 
 #include "pipeline_services.h" 
+#include "threads_services.h"
 
 struct product_record createLastProductRecord();
 
@@ -26,35 +27,39 @@ void main (int argc, char *argv[])
 	char *outputFile = argv[2];
 
     
-	// read records
-    struct product_record records[MAXFILES];
-    if (accessFile(inputFile, 0, records) == -1) 
-    {
-        printf("Failed to read text file: %s\n", argv[1]);
-        exit(1);
-    }
+    CreateReadThread();
+    CreateStationThreads();
+    CreateWriteThread();
+    pthread_exit(NULL);
+	// // read records
+    // struct product_record records[MAXFILES];
+    // if (accessFile(inputFile, 0, records) == -1) 
+    // {
+    //     printf("Failed to read text file: %s\n", argv[1]);
+    //     exit(1);
+    // }
    
-    // setup pipeline
-    int mypipe[MAXSTAGES + 1][2];
-	initializeStationPipes(mypipe);
+    // // setup pipeline
+    // int mypipe[MAXSTAGES + 1][2];
+	// initializeStationPipes(mypipe);
     
-    // pipe records to station 0
-    pipeRecordsToStation0(records, mypipe);
+    // // pipe records to station 0
+    // pipeRecordsToStation0(records, mypipe);
     
-    // fork and run each station
-    forkAndRunEachStation(records, mypipe);
+    // // fork and run each station
+    // forkAndRunEachStation(records, mypipe);
     
-    // output stats
-    sleep(1);
-    printf("Station #    Records Processed\n");
-    printf("---------    -----------------\n");
+    // // output stats
+    // sleep(1);
+    // printf("Station #    Records Processed\n");
+    // printf("---------    -----------------\n");
           
-    // pipe -1 to stations
-    sleep(.1);
-    struct product_record lastRecord = createLastProductRecord();
-    pipeEndRecordToAllStations(lastRecord, mypipe);
+    // // pipe -1 to stations
+    // sleep(.1);
+    // struct product_record lastRecord = createLastProductRecord();
+    // pipeEndRecordToAllStations(lastRecord, mypipe);
 
-    readFromStation4AndWrite(outputFile, mypipe);
+    // readFromStation4AndWrite(outputFile, mypipe);
 
     return;
 }

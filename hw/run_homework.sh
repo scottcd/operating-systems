@@ -40,34 +40,34 @@ RunOrders()
         echo "Reading from: ALL FILES"
         echo -e "-------------------------\n"
         echo -e "-------------------------\n"
-        ./hw3 order.txt out1
+        ./hw4 order.txt out1
         echo -e "-------------------------\n"
         echo -e "-------------------------\n"
-        ./hw3 order1.txt out2
+        ./hw4 order1.txt out2
         echo -e "-------------------------\n"
         echo -e "-------------------------\n"
-        ./hw3 order2.txt out3
+        ./hw4 order2.txt out3
     ;;
     # order.txt
     1)
         echo -e "\n-------------------------"
         echo "Reading from: order.txt"
         echo -e "-------------------------\n"
-        ./hw3 order.txt out
+        ./hw4 order.txt out
     ;;
     # order2.txt
     2)
  	echo -e "\n-------------------------"
         echo "Reading from: order.txt"
         echo -e "-------------------------\n"
-        ./hw3 order1.txt out
+        ./hw4 order1.txt out
     ;;
     # order1.txt
     3) 
         echo -e "\n-------------------------"
         echo "Reading from: order.txt"
         echo -e "-------------------------\n"
-        ./hw3 order2.txt out
+        ./hw4 order2.txt out
     ;;
     esac
     shift
@@ -77,7 +77,7 @@ RunOrders()
 # Main 
 ################################################################################    
 # Check to see if we already compiled
-if [ ! -f hw3 ]
+if [ ! -f hw4 ]
 then
     # Check for the existence of Makefile; if not there, quit with error, else run it
     if test -f "Makefile"; then
@@ -89,7 +89,7 @@ then
 fi
 
 # Second, check for the existence of hw1; if not there, quit with error
-if test -f "hw3"; then
+if test -f "hw4"; then
     echo
     while [ -n "$1" ]
     do
@@ -107,6 +107,6 @@ if test -f "hw3"; then
     
     
 else
-    echo "hw3 file not found."
+    echo "hw4 file not found."
     exit 1
 fi

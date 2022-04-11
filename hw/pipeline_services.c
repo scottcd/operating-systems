@@ -1,5 +1,7 @@
 #include "pipeline_services.h" 
 
+
+// init threads instead
 void initializeStationPipes(int mypipe[MAXSTAGES + 1][2]){
     for(int i = 0; i < MAXSTAGES + 1; i++)
     {
