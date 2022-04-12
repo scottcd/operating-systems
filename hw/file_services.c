@@ -5,6 +5,7 @@
 */
 
 #include "file_services.h"
+#include "thread_structs.h"
 
 int fileCount = 0;
 

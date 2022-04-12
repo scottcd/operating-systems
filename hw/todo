@@ -1,0 +1,19 @@
+rewrite using threads instead of processes
+
+parent should create 7 threads
+0 read input file, init stations to 0
+1 station 0
+2 station 1
+3 station 2
+4 station 3
+5 station 4
+6 write output
+
+remove pipes
+add array of queues of P_Record, one per stage + output (6 total)
+
+when a product rcord is ready to be sent to a station, enqueue it to its queue
+
+use counting semaphore to wait for queue
+use mutex for shared global data
+ 

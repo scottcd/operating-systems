@@ -9,10 +9,12 @@
 #include "station_services.h" 
 #include "pipeline_services.h" 
 #include "threads_services.h"
+#include "thread_structs.h"
+#include <pthread.h>
 
 struct product_record createLastProductRecord();
 
-#define MAXFILES 30
+
 
 // entry point for the program
 void main (int argc, char *argv[])
@@ -25,14 +27,21 @@ void main (int argc, char *argv[])
 
     char *inputFile = argv[1];
 	char *outputFile = argv[2];
-
+    struct product_record records[MAXFILES];
     
-    CreateReadThread();
-    CreateStationThreads();
-    CreateWriteThread();
+    pthread_t tid[7];
+
+    createReadThread(tid[0], inputFile, records);
+    
+    for(int i = 0; i < MAXSTAGES; i++)
+    {
+        createStationThreads(tid[i + 1]); 
+    }
+
+    createWriteThread(tid[6]);
     pthread_exit(NULL);
 	// // read records
-    // struct product_record records[MAXFILES];
+    
     // if (accessFile(inputFile, 0, records) == -1) 
     // {
     //     printf("Failed to read text file: %s\n", argv[1]);
