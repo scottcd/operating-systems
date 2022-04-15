@@ -11,11 +11,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdio.h>
+#include <semaphore.h>
 #include <stdlib.h>
+#include "queue.h"
 
-void forkAndRunEachStation(struct product_record records[], int mypipe[MAXSTAGES + 1][2];);
-void forkAChildStation(int station_number,  struct product_record records[], int mypipe[MAXSTAGES + 1][2]);
-int station0(int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record);
+int station0(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
 int station1(int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record);
 int station2(int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record);
 int station3(double runningTotal, int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record);

@@ -12,9 +12,6 @@
 #include "thread_structs.h"
 #include <pthread.h>
 
-struct product_record createLastProductRecord();
-
-
 
 // entry point for the program
 void main (int argc, char *argv[])
@@ -31,6 +28,7 @@ void main (int argc, char *argv[])
     
     pthread_t tid[7];
 
+    initializeSems();
     createReadThread(tid[0], inputFile, records);
     
     for(int i = 0; i < MAXSTAGES; i++)
@@ -38,47 +36,8 @@ void main (int argc, char *argv[])
         createStationThreads(tid[i + 1]); 
     }
 
-    createWriteThread(tid[6]);
+    createWriteThread(tid[6], outputFile);
     pthread_exit(NULL);
-	// // read records
-    
-    // if (accessFile(inputFile, 0, records) == -1) 
-    // {
-    //     printf("Failed to read text file: %s\n", argv[1]);
-    //     exit(1);
-    // }
-   
-    // // setup pipeline
-    // int mypipe[MAXSTAGES + 1][2];
-	// initializeStationPipes(mypipe);
-    
-    // // pipe records to station 0
-    // pipeRecordsToStation0(records, mypipe);
-    
-    // // fork and run each station
-    // forkAndRunEachStation(records, mypipe);
-    
-    // // output stats
-    // sleep(1);
-    // printf("Station #    Records Processed\n");
-    // printf("---------    -----------------\n");
-          
-    // // pipe -1 to stations
-    // sleep(.1);
-    // struct product_record lastRecord = createLastProductRecord();
-    // pipeEndRecordToAllStations(lastRecord, mypipe);
-
-    // readFromStation4AndWrite(outputFile, mypipe);
-
+	
     return;
-}
-
-struct product_record createLastProductRecord(){
-    struct product_record record;
-    for (int i = 0; i < MAXSTAGES; i++)
-    { 
-        record.stations[i] = -1;
-    }
-
-    return record;
 }

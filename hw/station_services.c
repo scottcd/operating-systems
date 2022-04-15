@@ -1,64 +1,17 @@
 #include "station_services.h" 
+#include <semaphore.h>
 
 
-void forkAndRunEachStation(struct product_record records[], int mypipe[MAXSTAGES + 1][2])
+int station0(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
 {
-    int status = 0;
-    // write each read record to the pipeline
-    int record_count = getRecordCount();   
-         
-    // create 5 child processes
-    for (int station_number = 0; station_number < 5; station_number++)
+    int stationStats = 0;
+    struct product_record record;
+    sem_wait(&mysem[0]);
+    while(1)
     {
-        forkAChildStation(station_number, records, mypipe);
-    }
-}   
-      
-void forkAChildStation(int station, struct product_record records[], int mypipe[MAXSTAGES + 1][2])
-{
-    int pid = fork();
-    int stationStats= 0;
-    int record_count = getRecordCount();
-    double runningTotal = 0;
+        dequeue(&product_queue[0], &record);
+        printf("%d\n\n", record.idnumber);
 
-    // pipe each file
-    for (int i = 0; i < record_count + 1; i++)
-    {
-        if (pid == 0) 
-        {  
-            struct product_record record;
-            read(mypipe[station][0], &record, sizeof(struct product_record));
-
-            if(record.stations[station] == -1)
-                {
-                    printStationStatistics(station, stationStats);
-                    _exit(0);
-                }
-
-            switch (station)
-            {                
-            case 0:            
-                stationStats = station0(stationStats, mypipe, record);
-                break;
-            case 1:
-                stationStats = station1(stationStats, mypipe, record);
-                break;
-            case 2:
-                stationStats = station2(stationStats, mypipe, record);
-                break;
-            case 3:               
-                stationStats = station3(runningTotal, stationStats, mypipe, record);
-                break;
-            default:
-                stationStats = station4(i, stationStats, mypipe, record);
-                break;
-            }
-        }
-    }
-}
-
-int station0( int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record)
-{
     // compute tax amount
     record.tax = (record.price * record.number) * .05;
     record.stations[0] = 1;
@@ -66,13 +19,15 @@ int station0( int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_rec
 
     if (record.number >= 1000)
     {
-        write(mypipe[1][1], NULL, sizeof(struct product_record)); 
-        write(mypipe[2][1], &record, sizeof(struct product_record)); 
+        //write(mypipe[1][1], NULL, sizeof(struct product_record)); 
+        //write(mypipe[2][1], &record, sizeof(struct product_record)); 
     }
     else{
-        write(mypipe[1][1], &record, sizeof(struct product_record)); 
+        //write(mypipe[1][1], &record, sizeof(struct product_record)); 
     }
-    
+        enqueue(&product_queue[1], &record);
+        sem_post(&mysem[1]);
+    }
     return stationStats;
 }
 

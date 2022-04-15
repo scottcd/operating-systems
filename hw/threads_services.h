@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
+void initializeSems();
 void createReadThread(pthread_t tid, char* fileName,struct product_record records[]);
 void createStationThreads(pthread_t tid);
-void createWriteThread(pthread_t tid);
+void createWriteThread(pthread_t tid, char* fileName);
+struct product_record createLastProductRecord();
