@@ -29,12 +29,13 @@ void initializeSems()
 
 void *readFiles(void *args)
 {
+    sem_wait(&mysem[0]);
     struct accessFile_struct *af = args;
     
     accessFile(af->fileName, 0, af->records);
     
     //printf("%s %d\n", af->fileName, af->records[0].idnumber);
-    //product_queue[0] = *(createQueue(sizeof(struct product_record)));
+    
     for (int i = 0; i < getRecordCount(); i++)
     {
         enqueue(&product_queue[0], &(af->records[i]));
@@ -52,7 +53,7 @@ void *runStation(void *args)
     switch (station)
     {
         case 0:
-        //station0(mysem, product_queue);
+        station0(mysem, product_queue);
         break;
         case 1:
         break;
@@ -75,12 +76,13 @@ void *writeFiles(void *args)
     strcat(path, fileName);
     fp = fopen(path, "w");
 
-    sem_wait(&mysem[0]);
+    sleep(1);
+    sem_wait(&mysem[1]);
     struct product_record temp;
     
     for (int i = 0; i < getRecordCount(); i++)
     {
-        dequeue(&product_queue[0], &temp);
+        dequeue(&product_queue[1], &temp);
         writeRecord(fp, &temp);
     }
 }

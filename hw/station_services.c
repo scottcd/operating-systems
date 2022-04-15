@@ -7,27 +7,34 @@ int station0(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
     int stationStats = 0;
     struct product_record record;
     sem_wait(&mysem[0]);
+    sem_wait(&mysem[1]);
     while(1)
     {
         dequeue(&product_queue[0], &record);
-        printf("%d\n\n", record.idnumber);
+        printf("%d %d\n\n", record.idnumber, record.stations[0]);
 
-    // compute tax amount
-    record.tax = (record.price * record.number) * .05;
-    record.stations[0] = 1;
-    stationStats++;
+        if(record.stations[0] == -1)
+            break;
 
-    if (record.number >= 1000)
-    {
-        //write(mypipe[1][1], NULL, sizeof(struct product_record)); 
-        //write(mypipe[2][1], &record, sizeof(struct product_record)); 
-    }
-    else{
-        //write(mypipe[1][1], &record, sizeof(struct product_record)); 
-    }
+        // compute tax amount
+        record.tax = (record.price * record.number) * .05;
+        record.stations[0] = 1;
+        stationStats++;
+
+        if (record.number >= 1000)
+        {
+            //write(mypipe[1][1], NULL, sizeof(struct product_record)); 
+            //write(mypipe[2][1], &record, sizeof(struct product_record)); 
+        }
+        else{
+            //write(mypipe[1][1], &record, sizeof(struct product_record)); 
+        }
         enqueue(&product_queue[1], &record);
-        sem_post(&mysem[1]);
+        
     }
+    //enqueue(&product_queue[1], &record);
+    sem_post(&mysem[0]);
+    sem_post(&mysem[1]);
     return stationStats;
 }
 
