@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
-void initializeSems();
+void initializeSemsAndQueues();
 void createReadThread(pthread_t tid, char* fileName,struct product_record records[]);
 void createStationThreads(pthread_t tid);
 void createWriteThread(pthread_t tid, char* fileName);

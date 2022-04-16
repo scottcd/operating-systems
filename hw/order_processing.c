@@ -28,7 +28,7 @@ void main (int argc, char *argv[])
     
     pthread_t tid[7];
 
-    initializeSems();
+    initializeSemsAndQueues();
     createReadThread(tid[0], inputFile, records);
     
     for(int i = 0; i < MAXSTAGES; i++)
@@ -37,7 +37,7 @@ void main (int argc, char *argv[])
     }
 
     createWriteThread(tid[6], outputFile);
+    
+    
     pthread_exit(NULL);
-	
-    return;
 }

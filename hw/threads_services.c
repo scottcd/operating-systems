@@ -14,13 +14,13 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 queue product_queue[MAXSTAGES + 2];
 sem_t mysem[MAXSTAGES + 1];
 
-void initializeSems()
+void initializeSemsAndQueues()
 {
     for (int i = 0; i < MAXSTAGES + 1; i++)
     {
         sem_init(&mysem[i], 0, 1);
     }
-    for (int i = 0; i < MAXSTAGES + 2; i++)
+    for (int i = 0; i < MAXSTAGES + 1; i++)
     {
         product_queue[i] = *(createQueue(sizeof(struct product_record)));
     }
@@ -49,19 +49,22 @@ void *runStation(void *args)
 {
     pthread_mutex_lock(&mutex);
     // run here
-    printf("Station: %d\n", station);
     switch (station)
     {
         case 0:
         station0(mysem, product_queue);
         break;
         case 1:
+        station1(mysem, product_queue);
         break;
         case 2:
+        station2(mysem, product_queue);
         break;
         case 3:
+        station3(mysem, product_queue);
         break;
         default:
+        station4(mysem, product_queue);
         break;
     }
     station++;
@@ -76,13 +79,14 @@ void *writeFiles(void *args)
     strcat(path, fileName);
     fp = fopen(path, "w");
 
+    // SLEEP HERE
     sleep(1);
-    sem_wait(&mysem[1]);
+    sem_wait(&mysem[5]);
     struct product_record temp;
     
     for (int i = 0; i < getRecordCount(); i++)
     {
-        dequeue(&product_queue[1], &temp);
+        dequeue(&product_queue[5], &temp);
         writeRecord(fp, &temp);
     }
 }

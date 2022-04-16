@@ -15,11 +15,11 @@
 #include <stdlib.h>
 #include "queue.h"
 
-int station0(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
-int station1(int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record);
-int station2(int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record);
-int station3(double runningTotal, int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record);
-int station4(int recordNumber, int stationStats, int mypipe[MAXSTAGES + 1][2], struct product_record record);
+void station0(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
+void station1(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
+void station2(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
+void station3(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
+void station4(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
 void printStationStatistics(int stationNumber, int stationStats);
 
 #endif 
