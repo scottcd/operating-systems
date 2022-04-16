@@ -2,5 +2,4 @@ todo
 ----
 move semaphores into while loop
 print stats after station 4 is done
-move thread_exit into thread functions
 make queue thread safe

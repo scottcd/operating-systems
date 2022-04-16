@@ -14,9 +14,19 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 queue product_queue[MAXSTAGES + 2];
 sem_t mysem[MAXSTAGES + 1];
 
+void waitSem6 ()
+{
+    sem_wait(&mysem[6]);
+}
+void postSem6 ()
+{
+    sem_post(&mysem[6]);
+}
+
+
 void initializeSemsAndQueues()
 {
-    for (int i = 0; i < MAXSTAGES + 1; i++)
+    for (int i = 0; i < MAXSTAGES + 2; i++)
     {
         sem_init(&mysem[i], 0, 1);
     }
@@ -43,6 +53,8 @@ void *readFiles(void *args)
     struct product_record rec = createLastProductRecord();
     enqueue(&product_queue[0], &rec);
     sem_post(&mysem[0]);
+
+    pthread_exit(0);
 }
 
 void *runStation(void *args)
@@ -69,6 +81,8 @@ void *runStation(void *args)
     }
     station++;
     pthread_mutex_unlock(&mutex);
+
+    pthread_exit(0);
 }
 
 void *writeFiles(void *args)
@@ -92,28 +106,29 @@ void *writeFiles(void *args)
         dequeue(&product_queue[5], &temp);
         writeRecord(fp, &temp);
     }
+    pthread_exit(0);
 }
 
 // Create the first thread to read our records.
-void createReadThread(pthread_t tid, char* fileName, struct product_record records[])
+void createReadThread(pthread_t *tid, char* fileName, struct product_record records[])
 {
     accessFile_struct *args = malloc(sizeof *args);
     args->fileName = fileName;
     memcpy(args->records, records, sizeof(struct product_record));
     
-    pthread_create(&tid, NULL, readFiles, args);
+    pthread_create(&*(tid), NULL, readFiles, args);
 }
 
 // Create our 5 station threads.
-void createStationThreads(pthread_t tid)
+void createStationThreads(pthread_t *tid)
 {
-    pthread_create(&tid, NULL, runStation, NULL);
+    pthread_create(&*(tid), NULL, runStation, NULL);
 }
 
 // Create the final thread to write our records.
-void createWriteThread(pthread_t tid, char* fileName)
+void createWriteThread(pthread_t *tid, char* fileName)
 {
-    pthread_create(&tid, NULL, writeFiles, fileName);
+    pthread_create(&*(tid), NULL, writeFiles, fileName);
 }
 
 

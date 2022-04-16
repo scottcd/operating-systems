@@ -14,7 +14,9 @@
 #include <pthread.h>
 
 void initializeSemsAndQueues();
-void createReadThread(pthread_t tid, char* fileName,struct product_record records[]);
-void createStationThreads(pthread_t tid);
-void createWriteThread(pthread_t tid, char* fileName);
+void createReadThread(pthread_t *tid, char* fileName,struct product_record records[]);
+void createStationThreads(pthread_t *tid);
+void createWriteThread(pthread_t *tid, char* fileName);
 struct product_record createLastProductRecord();
+void postSem6 ();
+void waitSem6 ();

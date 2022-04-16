@@ -29,15 +29,23 @@ void main (int argc, char *argv[])
     pthread_t tid[7];
 
     initializeSemsAndQueues();
-    createReadThread(tid[0], inputFile, records);
+
+    createReadThread(&tid[0], inputFile, records);
     
     for(int i = 0; i < MAXSTAGES; i++)
     {
-        createStationThreads(tid[i + 1]); 
+        createStationThreads(&tid[i + 1]); 
     }
 
-    createWriteThread(tid[6], outputFile);
+    createWriteThread(&tid[6], outputFile);
     
-    
-    pthread_exit(NULL);
+    pthread_join(tid[0], NULL);
+    pthread_join(tid[1], NULL);
+    pthread_join(tid[2], NULL);
+    pthread_join(tid[3], NULL);
+    pthread_join(tid[4], NULL);
+    pthread_join(tid[5], NULL);
+    pthread_join(tid[6], NULL);
+
+    //printf("hello there\n");
 }
