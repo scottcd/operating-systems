@@ -79,8 +79,11 @@ void *writeFiles(void *args)
     strcat(path, fileName);
     fp = fopen(path, "w");
 
-    // SLEEP HERE
-    sleep(1);
+    // poll until our queue is written to
+    while(isEmpty(&product_queue[5]) == 1)
+    {
+        ; 
+    }
     sem_wait(&mysem[5]);
     struct product_record temp;
     
