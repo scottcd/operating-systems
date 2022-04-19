@@ -39,19 +39,21 @@ void initializeSemsAndQueues()
 
 void *readFiles(void *args)
 {
-    sem_wait(&mysem[0]);
     struct accessFile_struct *af = args;
+    struct product_record record;
     
     accessFile(af->fileName, 0, af->records);
     
-    //printf("%s %d\n", af->fileName, af->records[0].idnumber);
-    
     for (int i = 0; i < getRecordCount(); i++)
     {
+        sem_wait(&mysem[0]);
         enqueue(&product_queue[0], &(af->records[i]));
+        sem_post(&mysem[0]);
     }
-    struct product_record rec = createLastProductRecord();
-    enqueue(&product_queue[0], &rec);
+
+    record = createLastProductRecord();
+    sem_wait(&mysem[0]);
+    enqueue(&product_queue[0], &record);
     sem_post(&mysem[0]);
 
     pthread_exit(0);
@@ -94,18 +96,30 @@ void *writeFiles(void *args)
     fp = fopen(path, "w");
 
     // poll until our queue is written to
-    while(isEmpty(&product_queue[5]) == 1)
+    while(1)
     {
-        ; 
+        sem_wait(&mysem[5]);
+        
+        if(isEmpty(&product_queue[5]) == 1)
+        {
+            sem_post(&mysem[5]);
+            continue;
+        }
+        
+        struct product_record record;
+        dequeue(&product_queue[5], &record);
+        
+        if(record.stations[0] == -1)
+        {
+            enqueue(&product_queue[1], &record);
+            sem_post(&mysem[5]);
+            break;
+        }
+        writeRecord(fp, &record);
+        sem_post(&mysem[5]);
     }
-    sem_wait(&mysem[5]);
-    struct product_record temp;
     
-    for (int i = 0; i < getRecordCount(); i++)
-    {
-        dequeue(&product_queue[5], &temp);
-        writeRecord(fp, &temp);
-    }
+    
     pthread_exit(0);
 }
 

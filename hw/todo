@@ -1,5 +1,4 @@
 todo
 ----
-move semaphores into while loop
 print stats after station 4 is done
 make queue thread safe
