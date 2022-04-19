@@ -2,6 +2,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 
+int stationStatistics[5];
 
 void station0(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
 {
@@ -47,7 +48,7 @@ void station0(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
     }
     
     // print stats here
-    printStationStatistics(0, stationStats);
+    writeStationStatistics(0, stationStats);
     return;
 }
 
@@ -88,7 +89,7 @@ void station1(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
         sem_post(&mysem[2]); 
     }
           
-    printStationStatistics(1, stationStats);
+    writeStationStatistics(1, stationStats);
     return;
 }
 
@@ -131,7 +132,7 @@ void station2(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
         sem_post(&mysem[3]);  
     }
     
-    printStationStatistics(2, stationStats);
+    writeStationStatistics(2, stationStats);
     return;
 }
 
@@ -175,7 +176,7 @@ void station3(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
         sem_post(&mysem[4]); 
     }
        
-    printStationStatistics(3, stationStats);
+    writeStationStatistics(3, stationStats);
     return;
 }
 
@@ -231,11 +232,17 @@ void station4(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
         sem_post(&mysem[5]);
     }
         
-    printStationStatistics(4, stationStats);
+    writeStationStatistics(4, stationStats);
     return;
 }
 
-void printStationStatistics(int stationNumber, int stationStats)
+void writeStationStatistics(int stationNumber, int stationStats)
 {   
-    printf("Station %d:\t    %d\n", stationNumber, stationStats);
+    stationStatistics[stationNumber] = stationStats;
+    //printf("Station %d:\t    %d\n", stationNumber, stationStats);
+}
+
+int* getStationStatistics()
+{
+    return stationStatistics;
 }

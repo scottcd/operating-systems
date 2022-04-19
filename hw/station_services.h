@@ -20,6 +20,7 @@ void station1(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
 void station2(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
 void station3(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
 void station4(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2]);
-void printStationStatistics(int stationNumber, int stationStats);
+void writeStationStatistics(int stationNumber, int stationStats);
+int* getStationStatistics();
 
 #endif 

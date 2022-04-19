@@ -47,5 +47,12 @@ void main (int argc, char *argv[])
     pthread_join(tid[5], NULL);
     pthread_join(tid[6], NULL);
 
-    //printf("hello there\n");
+
+    int* stats = getStationStatistics();
+    printf("Station Statistics\n");
+    printf("------------------\n");
+    for(int i = 0; i < MAXSTAGES; i++)
+    {
+        printf("Station %d: %d\n", i, stats[i]);
+    }
 }
