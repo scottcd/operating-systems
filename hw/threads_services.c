@@ -14,22 +14,13 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 queue product_queue[MAXSTAGES + 2];
 sem_t mysem[MAXSTAGES + 1];
 
-void waitSem6 ()
-{
-    sem_wait(&mysem[6]);
-}
-void postSem6 ()
-{
-    sem_post(&mysem[6]);
-}
-
-
 void initializeSemsAndQueues()
 {
     for (int i = 0; i < MAXSTAGES + 2; i++)
     {
         sem_init(&mysem[i], 0, 1);
     }
+    
     for (int i = 0; i < MAXSTAGES + 1; i++)
     {
         product_queue[i] = *(createQueue(sizeof(struct product_record)));

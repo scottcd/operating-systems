@@ -2,8 +2,11 @@
 #define Q
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <pthread.h>
+
 
 typedef struct _data {
 		void* data;
@@ -17,11 +20,11 @@ typedef struct _data {
 		data* tail;
 	}queue;
 
+	queue* safeCreate(size_t allocSize);
 	queue* createQueue(size_t allocSize);
-	queue* enqueue(queue* q, void* data);
-	queue* dequeue(queue* q, void* toRet);
-	queue* front(queue* q, void* toRet);
-	size_t getSize(queue* q);
+	void enqueue(queue* q, void* data);
+	void dequeue(queue* q, void* toRet);
+	void front(queue* q, void* toRet);
 	bool isEmpty(queue* q);
 
 	#endif

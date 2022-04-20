@@ -1,39 +1,32 @@
 #include "queue.h"
-#include <string.h>
+
+
+pthread_mutex_t qmutex = PTHREAD_MUTEX_INITIALIZER;
+
+queue* safeCreate(size_t allocSize)
+{
+	pthread_mutex_lock(&qmutex);
+	queue* q = createQueue(allocSize);
+	pthread_mutex_unlock(&qmutex);
+	return q;
+}
 
 queue* createQueue(size_t allocSize)
 {
 	queue* q = (queue*)malloc(sizeof(queue));
-	if (q == NULL)
-	{
-		//fprintf(stderr, "Malloc failed when creating queue object\n");
-		return NULL;
-	}
+		
 	q->allocationSize = allocSize;
 	q->size = 0;
 	q->head = q->tail = NULL;
+	
 	return q;
 }
 
-queue* enqueue(queue* q, void* _data)
+void enqueue(queue* q, void* _data)
 {
-	if (q == NULL)
-	{
-		//fprintf(stderr, "Queue can't be null");
-		return NULL;
-	}
 	data* toInsert = (data*)malloc(sizeof(data));
-	if (toInsert == NULL)
-	{
-		//fprintf(stderr, "Error allocating memory");
-		return NULL;
-	}
 	toInsert->data = malloc(q->allocationSize);
-	if (toInsert->data == NULL)
-	{
-		//fprintf(stderr, "Error allocating memory");
-		return NULL;;
-	}
+
 	toInsert->next = NULL;
 	memcpy(toInsert->data, _data, q->allocationSize);
 	if (q->size == 0)
@@ -48,17 +41,11 @@ queue* enqueue(queue* q, void* _data)
 
 	q->size++;
 
-	return q;
+	return;
 }
 
-queue* dequeue(queue* q, void* toRet)
+void dequeue(queue* q, void* toRet)
 {
-	if (q == NULL)
-	{
-		//fprintf(stderr, "Queue can't be null");
-		return NULL;
-	}
-
 	data* toDel = q->head;
 	if (q->size == 1)
 	{
@@ -67,7 +54,7 @@ queue* dequeue(queue* q, void* toRet)
 		free(toDel);
 		q->head = q->tail = NULL;
 		q->size--;
-		return q;
+		return;
 	}
 	q->head = q->head->next;
 	memcpy(toRet, toDel->data, q->allocationSize);
@@ -75,23 +62,12 @@ queue* dequeue(queue* q, void* toRet)
 	free(toDel);
 	q->size--;
 
-	return q;
+	return;
 }
 
-queue* front(queue* q, void* toRet)
+void front(queue* q, void* toRet)
 {
-	if (q == NULL)
-	{
-		//fprintf(stderr, "Queue can't be null");
-		return NULL;
-	}
-
 	memcpy(toRet, q->head->data, q->allocationSize);
-}
-
-size_t getSize(queue* q)
-{
-	return q->size;
 }
 
 bool isEmpty(queue* q)

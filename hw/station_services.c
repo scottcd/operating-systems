@@ -16,6 +16,7 @@ void station0(sem_t mysem[MAXSTAGES + 1], queue product_queue[MAXSTAGES + 2])
 
         if(isEmpty(&product_queue[0]) == 1)
         {
+            
             sem_post(&mysem[0]);
             sem_post(&mysem[1]);
             continue;
