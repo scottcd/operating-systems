@@ -28,6 +28,7 @@ void main (int argc, char *argv[])
     
     pthread_t tid[7];
 
+    initMutex();
     initializeSemsAndQueues();
 
     createReadThread(&tid[0], inputFile, records);

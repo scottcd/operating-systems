@@ -1,11 +1,14 @@
 #include "queue.h"
 
 
-pthread_mutex_t qmutex = PTHREAD_MUTEX_INITIALIZER;
+void initMutex()
+{
+	int i = pthread_mutex_init(&qmutex, NULL);
+}
 
 queue* safeCreate(size_t allocSize)
 {
-	pthread_mutex_lock(&qmutex);
+	int ret = pthread_mutex_trylock(&qmutex);
 	queue* q = createQueue(allocSize);
 	pthread_mutex_unlock(&qmutex);
 	return q;
@@ -40,7 +43,7 @@ void enqueue(queue* q, void* _data)
 	}
 
 	q->size++;
-
+	
 	return;
 }
 

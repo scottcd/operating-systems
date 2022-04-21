@@ -23,7 +23,7 @@ void initializeSemsAndQueues()
     
     for (int i = 0; i < MAXSTAGES + 1; i++)
     {
-        product_queue[i] = *(createQueue(sizeof(struct product_record)));
+        product_queue[i] = *(safeCreate(sizeof(struct product_record)));
     }
     
 }
