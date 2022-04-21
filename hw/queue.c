@@ -27,6 +27,7 @@ queue* createQueue(size_t allocSize)
 
 void enqueue(queue* q, void* _data)
 {
+	int ret = pthread_mutex_trylock(&qmutex);
 	data* toInsert = (data*)malloc(sizeof(data));
 	toInsert->data = malloc(q->allocationSize);
 
@@ -43,12 +44,13 @@ void enqueue(queue* q, void* _data)
 	}
 
 	q->size++;
-	
+	pthread_mutex_unlock(&qmutex);
 	return;
 }
 
 void dequeue(queue* q, void* toRet)
 {
+	int ret = pthread_mutex_trylock(&qmutex);
 	data* toDel = q->head;
 	if (q->size == 1)
 	{
@@ -57,6 +59,7 @@ void dequeue(queue* q, void* toRet)
 		free(toDel);
 		q->head = q->tail = NULL;
 		q->size--;
+		pthread_mutex_unlock(&qmutex);
 		return;
 	}
 	q->head = q->head->next;
@@ -64,16 +67,26 @@ void dequeue(queue* q, void* toRet)
 	free(toDel->data);
 	free(toDel);
 	q->size--;
-
+	pthread_mutex_unlock(&qmutex);
 	return;
 }
 
 void front(queue* q, void* toRet)
 {
+	int ret = pthread_mutex_trylock(&qmutex);
 	memcpy(toRet, q->head->data, q->allocationSize);
+	pthread_mutex_unlock(&qmutex);
 }
 
 bool isEmpty(queue* q)
 {
-	return q->size == 0 ? true : false;
+	int ret = pthread_mutex_trylock(&qmutex);
+	if(q->size == 0)
+	{
+		pthread_mutex_unlock(&qmutex);
+		return true;
+	}
+	pthread_mutex_unlock(&qmutex);
+	return false;
+	
 }
