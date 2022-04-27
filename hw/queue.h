@@ -23,7 +23,6 @@ typedef struct _data {
 	static pthread_mutex_t qmutex;
 
 	void initMutex();
-	queue* safeCreate(size_t allocSize);
 	queue* createQueue(size_t allocSize);
 	void enqueue(queue* q, void* data);
 	void dequeue(queue* q, void* toRet);
