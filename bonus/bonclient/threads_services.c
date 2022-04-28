@@ -10,16 +10,19 @@
 
 int station = 0;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-queue product_queue;
-sem_t mysem;
+queue product_queue[MAXSTAGES + 2];
+sem_t mysem[MAXSTAGES + 1];
 
 void initializeSemsAndQueues()
 {
-    sem_init(&mysem, 0, 1);
+    for (int i = 0; i < MAXSTAGES + 2; i++)
+    {
+        sem_init(&mysem[i], 0, 1);
+    }
     
     for (int i = 0; i < MAXSTAGES + 1; i++)
     {
-        product_queue = *(createQueue(sizeof(struct product_record)));
+        product_queue[i] = *(createQueue(sizeof(struct product_record)));
     }
     
 }
@@ -30,18 +33,17 @@ void *readFiles(void *args)
     struct product_record record;
     
     accessFile(af->fileName, 0, af->records);
-    
     for (int i = 0; i < getRecordCount(); i++)
     {
-        sem_wait(&mysem);
-        enqueue(&product_queue, &(af->records[i]));
-        sem_post(&mysem);
+        sem_wait(&mysem[0]);
+        enqueue(&product_queue[0], &(af->records[i]));
+        sem_post(&mysem[0]);
     }
 
     record = createLastProductRecord();
-    sem_wait(&mysem);
-    enqueue(&product_queue, &record);
-    sem_post(&mysem);
+    sem_wait(&mysem[0]);
+    enqueue(&product_queue[0], &record);
+    sem_post(&mysem[0]);
 
     pthread_exit(0);
 }
@@ -57,24 +59,24 @@ void *writeFiles(void *args)
     // poll until our queue is written to
     while(1)
     {
-        sem_wait(&mysem);
-        if(isEmpty(&product_queue) == 1)
+        sem_wait(&mysem[0]);
+        if(isEmpty(&product_queue[0]) == 1)
         {
-            sem_post(&mysem);
+            sem_post(&mysem[0]);
             continue;
         }
         
         struct product_record record;
-        dequeue(&product_queue, &record);
+        dequeue(&product_queue[0], &record);
         
         if(record.stations[0] == -1)
         {
-            enqueue(&product_queue, &record);
-            sem_post(&mysem);
+            enqueue(&product_queue[0], &record);
+            sem_post(&mysem[0]);
             break;
         }
         writeRecord(fp, &record);
-        sem_post(&mysem);
+        sem_post(&mysem[0]);
     }
     
     
