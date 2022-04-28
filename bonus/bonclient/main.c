@@ -1,19 +1,17 @@
 /*
 *  Chandler Scott
-*  Homework 1
-*  02/07/2022
+*  Bonus Socket Assignment - Client
+*  04/28/2022
 */
 
 #include "product_record.h" 
-#include "file_services.h" 
-#include "station_services.h" 
-#include "pipeline_services.h" 
-#include "threads_services.h"
-#include "thread_structs.h"
-#include <pthread.h>
+#include "threads_services.h" 
+#include <stdio.h>
+#include <stdlib.h> 
+#include "queue.h"
 
+#define MAXFILES 30
 
-// entry point for the program
 void main (int argc, char *argv[])
 {
 	if (argc != 5) 
@@ -27,12 +25,20 @@ void main (int argc, char *argv[])
     char *serverName = argv[3];
     char *serverPort = argv[4];
     struct product_record records[MAXFILES];
-    
+    pthread_t tid[2];
+
+    initMutex();
+    initializeSemsAndQueues();
+
     // read record from file
+    createReadThread(&tid[0], inputFile, records);
 
     // send record to server via socket
     // receive record from server on socket
 
     // write record to file
+    createWriteThread(&tid[1], outputFile);
 
+    pthread_join(tid[0], NULL);
+    pthread_join(tid[1], NULL); 
 }

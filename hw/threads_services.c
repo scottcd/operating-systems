@@ -1,12 +1,4 @@
-#include <pthread.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 #include "threads_services.h"
-#include "station_services.h"
-#include "thread_structs.h"
-#include "queue.h"
-#include <semaphore.h>
 
 
 int station = 0;
@@ -50,33 +42,6 @@ void *readFiles(void *args)
     pthread_exit(0);
 }
 
-void *runStation(void *args)
-{
-    pthread_mutex_lock(&mutex);
-    // run here
-    switch (station)
-    {
-        case 0:
-        station0(mysem, product_queue);
-        break;
-        case 1:
-        station1(mysem, product_queue);
-        break;
-        case 2:
-        station2(mysem, product_queue);
-        break;
-        case 3:
-        station3(mysem, product_queue);
-        break;
-        default:
-        station4(mysem, product_queue);
-        break;
-    }
-    station++;
-    pthread_mutex_unlock(&mutex);
-
-    pthread_exit(0);
-}
 
 void *writeFiles(void *args)
 {
@@ -89,25 +54,25 @@ void *writeFiles(void *args)
     // poll until our queue is written to
     while(1)
     {
-        sem_wait(&mysem[5]);
+        sem_wait(&mysem[0]);
         
         if(isEmpty(&product_queue[5]) == 1)
         {
-            sem_post(&mysem[5]);
+            sem_post(&mysem[0]);
             continue;
         }
         
         struct product_record record;
-        dequeue(&product_queue[5], &record);
+        dequeue(&product_queue[0], &record);
         
         if(record.stations[0] == -1)
         {
             enqueue(&product_queue[1], &record);
-            sem_post(&mysem[5]);
+            sem_post(&mysem[0]);
             break;
         }
         writeRecord(fp, &record);
-        sem_post(&mysem[5]);
+        sem_post(&mysem[0]);
     }
     
     
@@ -124,11 +89,6 @@ void createReadThread(pthread_t *tid, char* fileName, struct product_record reco
     pthread_create(&*(tid), NULL, readFiles, args);
 }
 
-// Create our 5 station threads.
-void createStationThreads(pthread_t *tid)
-{
-    pthread_create(&*(tid), NULL, runStation, NULL);
-}
 
 // Create the final thread to write our records.
 void createWriteThread(pthread_t *tid, char* fileName)
