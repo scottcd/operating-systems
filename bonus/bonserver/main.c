@@ -5,13 +5,14 @@
 */
 
 #include "product_record.h" 
-#include "file_services.h" 
-#include "station_services.h" 
-#include "pipeline_services.h" 
-#include "threads_services.h"
-#include "thread_structs.h"
-#include <pthread.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
+#define MAXFILES 30
 
 // entry point for the program
 void main (int argc, char *argv[])
@@ -24,10 +25,30 @@ void main (int argc, char *argv[])
 
     char *portNumber = argv[1];
 	struct product_record records[MAXFILES];
+    struct addrinfo* myinfo;
     
     // set up socket
+    int sockdesc = socket(AF_INET, SOCK_STREAM, 0);
+    int x = -1;
+    while (x == -1)
+    {
+        getaddrinfo("0.0.0.0", portNumber, NULL, &myinfo);
+        x = bind(sockdesc, myinfo->ai_addr, myinfo->ai_addrlen);  
+    }
+    printf("Listening to port %s.\n", portNumber);
+
+    int y = listen(sockdesc, 1);    
+    char m[1024];
 
     // read record from socket
+    while (1)
+    {
+        printf("Waiting for a connection...\n");
+        int connection = accept(sockdesc, NULL, NULL);
+        printf("%d\n", connection);
+        recv(connection, m, 2000, 0);
+        printf("%s\n", m);
+    }
 
     // process records
 
