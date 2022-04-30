@@ -38,24 +38,14 @@ void main (int argc, char *argv[])
     // read record from file
     createReadThread(&tid[0], inputFile, records);
 
-    // connect to socket
-    struct addrinfo* myinfo;
-    int sockdesc = socket(AF_INET, SOCK_STREAM, 0);
-    getaddrinfo(serverName, serverPort, NULL, &myinfo);
-    int connection = connect(sockdesc, myinfo->ai_addr, myinfo->ai_addrlen);
+   
 
-    // send record to server via socket
-    char* m = "hello world!\n\0";
-    send(sockdesc, m, strlen(m), 0);
-
-    // receive record from server on socket
-    //read(sockdesc, (char*)&m, strlen(m + 1));
-
-    close(sockdesc);
-
+    // send and receive record to server via socket
+    createSocketSendThread(&tid[0], serverName, serverPort);
+    pthread_join(tid[0], NULL);
+  
     // write record to file
     createWriteThread(&tid[1], outputFile);
-
-    pthread_join(tid[0], NULL);
+    
     pthread_join(tid[1], NULL); 
 }

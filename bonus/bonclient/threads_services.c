@@ -12,6 +12,8 @@ int station = 0;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 queue product_queue[MAXSTAGES + 2];
 sem_t mysem[MAXSTAGES + 1];
+int sockdesc = -1;
+int connection= -1;
 
 void initializeSemsAndQueues()
 {
@@ -48,6 +50,56 @@ void *readFiles(void *args)
     pthread_exit(0);
 }
 
+void *sendRecords(void *args)
+{
+    struct writeSocket_struct *af = args;
+    // connect to socket
+    struct addrinfo* myinfo;
+    
+    
+    // poll until our queue is written to
+    while(1)
+    {
+        
+        sem_wait(&mysem[0]);
+        sem_wait(&mysem[1]);
+        
+        if(isEmpty(&product_queue[0]) == 1)
+        {
+            sem_post(&mysem[1]);
+            sem_post(&mysem[0]);
+            continue;
+        }
+       
+        struct product_record record, rcv_record;
+        dequeue(&product_queue[0], &record);
+        
+        // set up socket connection
+        sockdesc = socket(AF_INET, SOCK_STREAM, 0);
+        getaddrinfo(af->serverName, af->serverPort, NULL, &myinfo);
+        
+        connection = connect(sockdesc, myinfo->ai_addr, myinfo->ai_addrlen);
+        
+        printf("Sending %s to socket %d\n",record.name, sockdesc);
+        send(sockdesc, &record, sizeof(struct product_record), 0);
+        
+        read(sockdesc, &rcv_record, sizeof(struct product_record));
+        printf("Reading %s from socket %d\n", record.name, sockdesc);
+        enqueue(&product_queue[1], &rcv_record);
+
+        sem_post(&mysem[0]);
+        sem_post(&mysem[1]);
+        
+        if(record.stations[0] == -1)
+        {
+            break;
+        }
+    }
+    
+    close(sockdesc);
+    pthread_exit(0);
+}
+
 void *writeFiles(void *args)
 {
     char *fileName = args;
@@ -59,24 +111,24 @@ void *writeFiles(void *args)
     // poll until our queue is written to
     while(1)
     {
-        sem_wait(&mysem[0]);
-        if(isEmpty(&product_queue[0]) == 1)
+        sem_wait(&mysem[1]);
+        if(isEmpty(&product_queue[1]) == 1)
         {
-            sem_post(&mysem[0]);
+            sem_post(&mysem[1]);
             continue;
         }
         
         struct product_record record;
-        dequeue(&product_queue[0], &record);
+        dequeue(&product_queue[1], &record);
         
         if(record.stations[0] == -1)
         {
-            enqueue(&product_queue[0], &record);
-            sem_post(&mysem[0]);
+            sem_post(&mysem[1]);
             break;
         }
+        
         writeRecord(fp, &record);
-        sem_post(&mysem[0]);
+        sem_post(&mysem[1]);
     }
     
     
@@ -93,6 +145,15 @@ void createReadThread(pthread_t *tid, char* fileName, struct product_record reco
     pthread_create(&*(tid), NULL, readFiles, args);
 }
 
+// Create the first thread to read our records.
+void createSocketSendThread(pthread_t *tid, char* serverName, char* serverPort)
+{
+    writeSocket_struct *args = malloc(sizeof *args);
+    args->serverName = serverName;
+    args->serverPort = serverPort;
+    
+    pthread_create(&*(tid), NULL, sendRecords, args);
+}
 
 // Create the final thread to write our records.
 void createWriteThread(pthread_t *tid, char* fileName)

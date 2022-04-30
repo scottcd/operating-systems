@@ -5,12 +5,16 @@
 */
 
 #include "product_record.h" 
+#include "station_services.h" 
+#include "threads_services.h" 
+#include <stdio.h>
+#include <stdlib.h> 
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "queue.h"
+
+
 
 #define MAXFILES 30
 
@@ -23,10 +27,15 @@ void main (int argc, char *argv[])
         exit(1);
     }     
 
+    pthread_t tid[2];
+    initMutex();
+    initializeSemsAndQueues();
+
     char *portNumber = argv[1];
 	struct product_record records[MAXFILES];
     struct addrinfo* myinfo;
     
+
     // set up socket
     int sockdesc = socket(AF_INET, SOCK_STREAM, 0);
     int x = -1;
@@ -37,21 +46,15 @@ void main (int argc, char *argv[])
     }
     printf("Listening to port %s.\n", portNumber);
 
-    int y = listen(sockdesc, 1);    
-    char m[1024];
+    int y = listen(sockdesc, 1); 
 
     // read record from socket
     while (1)
-    {
+    {   
         printf("Waiting for a connection...\n");
+        
         int connection = accept(sockdesc, NULL, NULL);
-        printf("%d\n", connection);
-        recv(connection, m, 2000, 0);
-        printf("%s\n", m);
+        handleRecord(&tid[0],connection);
     }
-
-    // process records
-
-    // write to client
-
+    
 }
