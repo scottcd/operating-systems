@@ -13,7 +13,7 @@ T_TARGET = ./build/threads
 D_SOURCES = ./src/data_race.c
 D_TARGET = ./build/data_race
 
-.PHONY: all clean
+.PHONY: all clean setup
 
 # Default target
 all: setup $(T_TARGET) $(D_TARGET)
