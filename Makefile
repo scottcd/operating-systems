@@ -22,10 +22,10 @@ setup:
 	mkdir -p $(BUILD_DIR)
 
 $(T_TARGET): $(T_SOURCES) 
-	$(BUILD_TOOL) $(T_SOURCES) -o $(T_TARGET)
+	$(BUILD_TOOL) $(T_SOURCES) -pthread -o $(T_TARGET)
 
 $(D_TARGET): $(D_SOURCES) 
-	$(BUILD_TOOL) $(D_SOURCES) -o $(D_TARGET)
+	$(BUILD_TOOL) $(D_SOURCES) -pthread -o $(D_TARGET)
 
 # Clean target to remove build artifacts
 clean:  
